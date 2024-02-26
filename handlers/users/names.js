@@ -1,6 +1,7 @@
 const { join: path } = require("path");
 
 const imgNameKeys = require("../../keyboards/inline/imgNameKeys");
+const ramadanKey = require("../../keyboards/inline/ramadanKeys");
 
 const { Composer } = require("telegraf");
 const composer = new Composer();
@@ -17,6 +18,29 @@ const namesState = require("../../states/names");
 const nameToImg = require("../../utils/app/names");
 
 const namesToImgFunctions = Object.keys(nameToImg);
+
+composer.on(
+  callbackFilter((data) => data === "ramadan_celebration"),
+  async (ctx) => {
+    await ctx.replyWithPhoto(
+      {
+        source: path(
+          __dirname,
+          "../../",
+          "public",
+          "images",
+          "templates",
+          `image4.png`
+        ),
+      },
+      {
+        caption: "Namuna rasim raqamini tanlang:",
+        reply_markup: ramadanKey.reply_markup,
+      }
+    );
+    await ctx.deleteMessage();
+  }
+);
 
 // handlers
 composer.on(

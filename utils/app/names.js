@@ -161,3 +161,71 @@ exports.studentGirl = async (text) =>
   main(text, 50, true, "round-pics/student-girl", 10, 570);
 exports.whiteheadBoy = async (text) =>
   main(text, 50, true, "round-pics/whitehead-boy", 10, 570);
+
+const template = async (text, fontSize, image, x, y) => {
+  try {
+    const imgRaw = `public/images/raw/ramadan-images/${image}.png`; //a 500px x 500px background image
+    const imgActive = `public/images/active/ramadan-images/${image}.png`;
+    let imgExported = `public/images/export/${uuid()}.png`;
+
+    const textData = {
+      text: `${text}`, //the text to be rendered on the image
+      maxWidth: 620, //image width - 10px margin left - 10px margin right
+      maxHeight: 80, //text height + margin
+      placementX: x || 10, // on the x-axis
+      placementY: y || 90, //bottom of the image
+    };
+    const clone = await Jimp.read(imgRaw);
+    await clone.clone().write(imgActive);
+
+    // Load the font
+    // const textSize = 50
+    const font = await Jimp.loadFont(
+      `./public/fonts/arabic/arab3end-${fontSize || 100}/font.fnt`
+    );
+    // const font3 = await Jimp.loadFont(`./public/fonts/text-${textSize}-cyan/font.fnt`);
+    // const fontKhalif = await Jimp.loadFont("./public/fonts/khalif36/khalif.fnt");
+
+    // Read the cloned (active) image
+    const active = await Jimp.read(imgActive);
+
+    // Create a new image for the text shadow
+
+    // Print the original text on the original image
+    active.print(
+      font,
+      textData.placementX,
+      textData.placementY,
+      {
+        text: textData.text,
+        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+      },
+      textData.maxWidth
+    );
+
+    // Save the final image
+    await active.quality(100).write(imgExported);
+
+    setTimeout(() => {
+      fs.unlink(imgExported, (err) => {
+        if (err) console.log(err);
+        else {
+          // console.log(`\nDeleted file: ${imgExported}`);
+        }
+      });
+    }, 20000);
+    return imgExported;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.iftorlik = async (text) => await template(text, 100, "img1");
+exports.saharlik = async (text) => await template(text, 100, "img2");
+exports.maleTabrik = async (text) => await template(text, 50, "img3", 190, 420);
+exports.femaleTabrik = async (text) =>
+  await template(text, 50, "img4", 190, 420);
+exports.fastingcelebration = async (text) =>
+  await template(text, 80, "img5", 10, 200);
+exports.ramadanCelebration = async (text) =>
+  await template(text, 30, "img6", 90, 305);
